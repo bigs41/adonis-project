@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Swagger UI</title>
+    
+    <!-- required assets to run swagger-ui -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" type="text/css" media="screen">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.7/css/materialize.min.css" rel="stylesheet" type="text/css" media="screen">
+    <link href="http://cdn.magloft.com/swagger/swagger-ui.min.css" rel="stylesheet" type="text/css" media="screen">
+    <!-- <script src="/docs/js/swagger-ui.min.js" type="text/javascript" charset="utf-8"></script> -->
+    <script src="http://cdn.magloft.com/swagger/swagger-ui.min.js" type="text/javascript" charset="utf-8"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.7/js/materialize.min.js" type="text/javascript" charset="utf-8"></script>
+    
+    <!-- remove to disable json/xml editor -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.2.5/ace.js" type="text/javascript" charset="utf-8"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.2.5/mode-json.js" type="text/javascript" charset="utf-8"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.2.5/mode-xml.js" type="text/javascript" charset="utf-8"></script>
+
+    <!-- initialize swagger-ui -->
+
+    <style>
+    .side-nav{
+        width: 75px;
+    }
+    #header, footer, main {
+        padding-left: 75px;
+    }
+    ul.operations li.operation div.operation-main div.operation-result {
+        font-size: 12px;
+        max-width: 960px;
+        transition: all .5s;
+        background-color: #F5F5F5;
+        border-left: 1px solid #EEE;
+        color: #000;
+        padding: 20px;
+        min-width: 960px;
+    }
+    .operation-params td.code {
+        padding: 10px 20px;
+        width: 80%;
+    }
+
+    .json{
+      background-color: #292929;
+      color: wheat;
+      padding: 12px;
+      width: 100%;
+    }
+    .collapsible .collapsible-body {
+      padding: 0 0!important;
+    }
+    </style>
+    <script type="text/javascript">
+    function submit() {
+      console.log(11111111111);
+    }
+    function  empty(str){
+      return !str || !/[^\s]+/.test(str);
+    }
+    function filterList($byid,$this) {
+        var input, filter, ul, li, a, i;
+        // $byid = $(document).find('#BMA_Mlearn_endpoint_list').attr('id');
+
+        input = $this;
+        filter = input.value.toUpperCase();
+
+        $(document).find('#'+$byid).find('li.endpoint').each(function(){
+          a = $(this).find('a.path.toggleOperation')
+          
+          if(a.text().toUpperCase().indexOf(filter) > -1){
+            $(this).css('display','');
+          }else{
+            $(this).css('display','none');
+          }
+        })
+    }
+    function copyToClipboard(element) 
+    {
+      var val = $(element).parent().find("pre.json").text();
+      var $temp = $("<input>");
+      $("body").append($temp);
+      $temp.val(val).select();
+      document.execCommand("copy");
+      $temp.remove();
+      Materialize.toast('Copied!', 2000)
+    }
+    function expandAll(main_id){
+      var collapsibleHeader = $(".collapsible-header")
+      var collapsible = $(".collapsible")
+      if(!empty(main_id)){
+        collapsibleHeader = $(main_id).find(".collapsible-header")
+        collapsible = $(main_id).find(".collapsible")
+      }
+      collapsibleHeader.addClass("active");
+      collapsible.collapsible({accordion: false});
+    }
+
+    function collapseAll(main_id){
+      var collapsibleHeader = $(".collapsible-header")
+      var collapsible = $(".collapsible")
+      if(!empty(main_id)){
+        collapsibleHeader = $(main_id).find(".operation-result .collapsible-header")
+        collapsible = $(main_id).find(".operation-result .collapsible")
+      }
+      collapsibleHeader.removeClass(function(){
+        return "active";
+      });
+      collapsible.collapsible({accordion: true});
+      collapsible.collapsible({accordion: false});
+    }
+    </script>
+<script type="text/javascript">
+  $(function () {
+    
+    var url = window.location.search.match(/url=([^&]+)/);
+    if (url && url.length > 1) {
+      url = decodeURIComponent(url[1]);
+    }else{
+      url = "http://petstore.swagger.io/v2/swagger.json";
+    }
+    url = "/swagger.json";
+
+
+    hljs.configure({
+      highlightSizeThreshold: 5000
+    });
+
+    // Pre load translate...
+    if(window.SwaggerTranslator) {
+      window.SwaggerTranslator.translate();
+    }
+    window.swaggerUi = new SwaggerUi({
+      url: url,
+      supportedSubmitMethods: ['get', 'post', 'put', 'delete', 'patch'],
+      onComplete: function(swaggerApi, swaggerUi) {
+        
+        $('.button-collapse').sideNav({menuWidth: 300});
+        $('ul.tabs').tabs();
+        $('select').material_select();
+        $('.collapsible').collapsible({accordion: false});
+        
+        if(typeof initOAuth == "function") {
+          initOAuth({
+          clientId: "your-client-id",
+          clientSecret: "your-client-secret-if-required",
+          realm: "your-realms",
+          appName: "your-app-name",
+          scopeSeparator: " ",
+          additionalQueryStringParams: {}
+          });
+        }
+
+        if(window.SwaggerTranslator) {
+          window.SwaggerTranslator.translate();
+        }
+      },
+      onFailure: function(data) {
+        log("Unable to Load SwaggerUI");
+      },
+      docExpansion: "none",
+      jsonEditor: true,
+      defaultModelRendering: 'schema',
+      showRequestHeaders: true
+    });
+
+    window.swaggerUi.load();
+
+    setTimeout(() => {
+          $(document).find('.operation-result.response div').each(function(k,v){
+            var header = $(this).prev().text();
+            var title = $(this).closest('.content').attr('id');
+
+            $(this).prev().remove();
+            $(this).wrap( "<ul class=\"collapsible\" id=\""+title+"\" data-collapsible=\"expandable\"><li class='"+header+"_"+k+"'></li></ul>" ).before('<div class="collapsible-header active"><i class="mdi-navigation-chevron-right"></i><a name=""/>'+header+'</a></div>')
+            $(this).wrap('<div class="collapsible-body  active"></div>');
+          });
+          $(document).find('.operation-result.response').each(function(){
+            var title = $(this).closest('.content').attr('id');
+            $(this).prepend(`
+            <nav class="grey darken-1">
+              <div class="nav-wrapper">
+                <ul class="left hide-on-med-and-down">
+                  <li><a class="waves-effect waves-light btn" href="javascript:expandAll('#`+title+`')">expandAll</a></li>
+                  <li><a class="waves-effect waves-light btn" href="javascript:collapseAll('#`+title+`')">collapseAll</a></li>
+                </ul>
+              </div>
+            </nav>
+            `)
+          })
+          $(document).find('.card-header-title').each(function(){
+            var dataId = $(this).parent().find('.toggleEndpointList').data('id');
+            $(this).after('<div class="input-field col s6"><input placeholder="search" id="first_name" type="text" onkeyup="filterList(\''+dataId+'_endpoint_list\',this)" class="validate"></div>');
+          });
+          $(document).find('.response_body').each(function(){
+            $(this).before('<span onclick="copyToClipboard(this)" class="btn" style="float: right;margin: 5px;">copy</span>');
+          });
+
+          // Open
+          $('.collapsible').collapsible('open', 0);
+          // Close
+          $('.collapsible').collapsible('close', 0);
+          // Destroy
+          $('.collapsible').collapsible('destroy');
+          $('.tooltipped').tooltip({delay: 50});
+        }, 400);
+  });
+</script>
+  </head>
+  <body></body>
+</html>

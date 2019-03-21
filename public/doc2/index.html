@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title id="title">swagger-ui-layer</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="format-detection" content="telephone=no">
+    <link rel="stylesheet" type="text/css" href="./swagger-ui-layer/src/main/resources/webjars/css/bootstrap.4.1.3.min.css">
+    <link rel="stylesheet" type="text/css"
+          href="./swagger-ui-layer/src/main/resources/webjars/layui/css/layui.css">
+    <link rel="stylesheet" type="text/css" href="./swagger-ui-layer/src/main/resources/webjars/css/global.css">
+    <link rel="stylesheet" type="text/css" href="./swagger-ui-layer/src/main/resources/webjars/css/jquery.json-viewer.css">
+    <link rel="stylesheet" type="text/css" href="./swagger-ui-layer/src/main/resources/webjars/css/simple-table-styling.css">
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css">
+    <style>
+    @import "https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700";
+
+
+    body {
+        font-family: 'Poppins', sans-serif;
+        background: #fafafa;
+    }
+
+    p {
+        font-family: 'Poppins', sans-serif;
+        font-size: 1.1em;
+        font-weight: 300;
+        line-height: 1.7em;
+        color: #999;
+    }
+
+    a, a:hover, a:focus {
+        color: inherit;
+        text-decoration: none;
+        transition: all 0.3s;
+    }
+    #root textarea,#root button{
+        display: none;
+    }
+    #sidebar {
+        /* don't forget to add all the previously mentioned styles here too */
+        background: #393d49;
+        color: #fff;
+        transition: all 0.3s;
+    }
+
+    #sidebar .sidebar-header {
+        padding: 0;
+        background: #282b35;
+    }
+
+    #sidebar ul.components {
+        padding: 20px 0;
+        border-bottom: 1px solid #47748b;
+    }
+
+    #sidebar ul p {
+        color: #fff;
+        padding: 10px;
+    }
+
+    #sidebar ul li a {
+        padding-left: 10px;
+        font-size: 1.1em;
+        display: block;
+    }
+    #sidebar ul li a:hover {
+        color: #393d49;
+        background: #fff;
+    }
+
+    #sidebar ul li.active > a, a[aria-expanded="true"] {
+        color: #fff;
+        background: #6d7fcc;
+    }
+    ul ul a {
+        font-size: 0.9em !important;
+        padding-left: 30px !important;
+        background: #6d7fcc;
+    }
+
+    .wrapper {
+        display: flex;
+        width: 100%;
+    }
+    #sidebar {
+        width: 250px;
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100vh;
+        z-index: 999;
+        background: #393d49;
+        color: #fff;
+        transition: all 0.3s;
+        
+    }
+    #sidebar.active {
+        margin-left: -250px;
+        transform: rotateY(100deg); /* Rotate sidebar vertically by 100 degrees. */
+    }
+    #sidebar-toggle{
+        width: 10px;
+        height: 100vh;
+        float: left;
+        background: #d4d4d4;
+        position: absolute;
+        left: 250px;
+        z-index: 999;
+        cursor: pointer;
+    }
+    #sidebar-toggle.active {
+        left: 0;
+    }
+    #path-body{
+        padding-left: 15px;
+    }
+    #path-body.active{
+            margin-left: -250px;
+            width: 100%;
+        }
+    @media (max-width: 768px) {
+        /* Reversing the behavior of the sidebar: 
+        it'll be rotated vertically and off canvas by default, 
+        collapsing in on toggle button click with removal of 
+        the vertical rotation.   */
+        #sidebar {
+            margin-left: -250px;
+            transform: rotateY(100deg);
+        }
+        #sidebar.active {
+            margin-left: 0;
+            transform: none;
+        }
+        #sidebar-toggle {
+            left: 0;
+        }
+        #sidebar-toggle.active {
+            left: 0;
+            transform: none;
+        }
+        #sidebar {
+            margin-left: -250px;
+            transform: rotateY(100deg);
+        }
+        #path-body{
+            margin-left: -250px;
+            width: 100%;
+        }
+        /* Reversing the behavior of the bars: 
+        Removing the rotation from the first,
+        last bars and reappear the second bar on default state, 
+        and giving them a vertical margin */
+        #sidebarCollapse span:first-of-type,
+        #sidebarCollapse span:nth-of-type(2),
+        #sidebarCollapse span:last-of-type {
+            transform: none;
+            opacity: 1;
+            margin: 5px auto;
+        }
+
+        /* Removing the vertical margin and make the first and last bars rotate again when the sidebar is open, hiding the second bar */
+        #sidebarCollapse.active span {
+            margin: 0 auto;
+        }
+        #sidebarCollapse.active span:first-of-type {
+            transform: rotate(45deg) translate(2px, 2px);
+        }
+        #sidebarCollapse.active span:nth-of-type(2) {
+            opacity: 0;
+        }
+        #sidebarCollapse.active span:last-of-type {
+            transform: rotate(-45deg) translate(1px, -1px);
+        }
+    }
+    .layui-layout-admin .layui-body {
+        top: 0;
+        bottom: 0;
+    }
+    #sidebar-body{
+        height: 100%;
+        overflow-x: auto;
+    }
+
+    </style>
+</head>
+<body>
+<script id="template" type="text/template">
+    <div class="layui-layout layui-layout-admin wrapper"
+         style="border-bottom: solid 3px #1aa094;">
+        
+        <div class="row">
+                <nav id="sidebar">
+                        <div class="sidebar-header layui-header header">
+                                <div class="layui-main">
+                                        <div class="admin-login-box logo">
+                                            <span>{{:info.title}}<small class="version">{{:info.version}}</small></span>
+                                        </div>
+                                </div>
+                        </div>
+                        
+
+                            <ul class="layui-nav layui-nav-tree beg-navbar" id="sidebar-body">
+                                    {{for tags itemVar="~tag"}}
+                                    {{if name != "basic-error-controller"}}
+                                    <li class="layui-nav-item"><a href="#/{{:name}}">
+                                        <!-- <i class="fa fa-cogs" aria-hidden="true"data-icon="fa-cogs"></i> -->
+                                        <span>{{:name}}</span><span class="layui-nav-more"></span></a>
+                                        <dl class="layui-nav-child">
+                                            {{!--Get the corresponding method under tags--}}
+                                            {{props ~root.paths itemVar="~path"}}
+                                            {{!--specific method--}}
+                                            {{props prop}}
+                                            {{if prop.tags[0] == ~tag.name}}
+                                            <dd title="{{:key}} {{:prop.description}}">
+                                                <a href="#{{:prop.tags[0]}}/{{:prop.operationId}}" name="a_path" path="{{:~path.key}}" method="{{:key}}"
+                                                   operationId="{{:prop.operationId}}"><i class="fa fa-navicon"
+                                                                                          data-icon="fa-navicon"></i><cite class="">{{:~path.key}}</cite><br><cite
+                                                        class="{{:key}}_font">{{:prop.summary}}</cite></a>
+                                            </dd>
+                                            {{/if}}
+                                            {{/props}}
+                                            {{/props}}
+                                        </dl>
+                                    </li>
+                                    {{/if}}
+                                    {{/for}}
+                            </ul>
+                            
+                    </nav>
+                    <div id="sidebar-toggle" ></div>
+            <!-- 
+            <div class="layui-side layui-bg-black" id="admin-side">
+                <div class="layui-side-scroll" id="admin-navbar-side"
+                     lay-filter="side">
+                    <ul class="layui-nav layui-nav-tree beg-navbar">
+                        {{for tags itemVar="~tag"}}
+                        {{if name != "basic-error-controller"}}
+                        <li class="layui-nav-item"><a href="javascript:;"><i class="fa fa-cogs" aria-hidden="true"
+                                                                             data-icon="fa-cogs"></i>
+                            <cite>{{:name}}</cite><span class="layui-nav-more"></span></a>
+                            <dl class="layui-nav-child">
+                                {{!--Get the corresponding method under tags--}}
+                                {{props ~root.paths itemVar="~path"}}
+                                {{!--specific method--}}
+                                {{props prop}}
+                                {{if prop.tags[0] == ~tag.name}}
+                                <dd title="{{:key}} {{:prop.description}}">
+                                    <a href="javascript:;" name="a_path" path="{{:~path.key}}" method="{{:key}}"
+                                       operationId="{{:prop.operationId}}"><i class="fa fa-navicon"
+                                                                              data-icon="fa-navicon"></i><cite class="">{{:~path.key}}</cite><br><cite
+                                            class="{{:key}}_font">{{:prop.summary}}</cite></a>
+                                </dd>
+                                {{/if}}
+                                {{/props}}
+                                {{/props}}
+                            </dl>
+                        </li>
+                        {{/if}}
+                        {{/for}}
+                    </ul>
+                </div>
+            </div> -->
+            <div class="layui-body site-content" id="path-body"
+                 style="">
+            </div>
+    
+            {{if info.license}}
+            <div class="layui-footer footer">
+                <div class="layui-main">
+                    <a href="{{:info.license.url}}" target="blank">{{:info.license.name}}</a></p>
+                </div>
+            </div>
+            {{/if}}
+        </div>
+    </div>
+</script>
+<script id="temp_body" type="text/template">
+    <div class="layui-tab layui-tab-brief">
+        <ul class="layui-tab-title">
+            <li class="layui-this">
+                <span class="method {{:method}}" m_operationId="{{:operationId}}" path="{{:path}}" method="{{:method}}">{{:method}}
+                </span>{{:path}}
+            </li>
+            <li class="">try</li>
+            <li style="float:right" >
+                <a href="javascript:void(0)" id="printDoc">
+                    <i class="fa fa-print" aria-hidden="true"></i>
+                </a>
+                <div id="editor"></div>
+            </li>
+        </ul>
+        <div class="layui-tab-content" style="min-height: 150px; padding: 5px 0px 0px; height: 803px;">
+            <div class="layui-tab-item layui-show" id="document_data">
+                <table class="layui-table">
+                    <colgroup>
+                        <col width="150">
+                        <col width="150">
+                        <col width="150">
+                        <col>
+                    </colgroup>
+                    <tbody>
+                    <tr>
+                        <th>Path</th>
+                        <td colspan="3" id="url_path">{{:rootpath}}</td>
+                    </tr>
+                    <tr>
+                        <th>Summary</th>
+                        <td colspan="3">{{:summary}}</td>
+                    </tr>
+                    <tr>
+                        <th>Description</th>
+                        <td colspan="3">{{:description}}</td>
+                    </tr>
+                    <tr>
+                        <th>Consumes</th>
+                        <td id="consumes_{{:operationId}}">{{:consumes}}</td>
+                        <th>Produces</th>
+                        <td>{{:produces}}</td>
+                    </tr>
+                    </tbody>
+                </table>
+                <fieldset class="layui-elem-field layui-field-title">
+                    <legend>Parameters</legend>
+                </fieldset>
+                <table class="layui-table">
+                    <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Description</th>
+                        <th>Parameter Type</th>
+                        <th>Data Type</th>
+                        <th>Default</th>
+                        <th>Required</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {{for parameters}}
+                    <tr>
+                        <td>{{:name}}</td>
+                        <td>{{:description}}</td>
+                        <td>{{:in}}</td>
+                        <td>{{:type}}</td>
+                        <td>{{:default}}</td>
+                        {{if required}}
+                        <td><i class="layui-icon">&#xe618;</i></td>
+                        {{else}}
+                        <td></td>
+                        {{/if}}
+                    </tr>
+                    {{/for}}
+                    </tbody>
+                </table>
+
+                <div id="path-body-request-model">
+
+                </div>
+                <fieldset class="layui-elem-field layui-field-title">
+                    <legend>Responses</legend>
+                </fieldset>
+                <div id="path-body-response-model">
+
+                </div>
+            </div>
+            <div class="layui-tab-item">
+                <fieldset class="layui-elem-field layui-field-title">
+                    <legend>Parameters</legend>
+                </fieldset>
+                <div class="method-type">
+                    <lable>Parameter Type :</lable>
+                    <input type="hidden" id="content_type_{{:operationId}}" value="form">
+                    <button id="pt_form_{{:operationId}}" type="form" operationId="{{:operationId}}"
+                            onclick="changeParameterType(this)"
+                            class="layui-btn layui-btn-small layui-btn-normal layui-btn-radius">Form
+                    </button>
+                    <button id="pt_json_{{:operationId}}" type="json" operationId="{{:operationId}}"
+                            onclick="changeParameterType(this)"
+                            class="layui-btn layui-btn-small layui-btn-primary layui-btn-radius">Json
+                    </button>
+                </div>
+                <textarea class="parameter-text hide" rows="10" id="text_tp_{{:operationId}}"></textarea>
+                <form id="form_{{:operationId}}">
+                    <table class="layui-table" id="table_tp_{{:operationId}}">
+                        <colgroup>
+                            <col width="150">
+                            <col>
+                            <col>
+                            <col width="150">
+                            <col width="150">
+                            <col>
+                        </colgroup>
+                        <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Value</th>
+                            <th>Description</th>
+                            <th>Parameter Type</th>
+                            <th>Data Type</th>
+                            <th>Required</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {{for parameters}}
+                        <tr>
+                            <td>{{:name}}</td>
+                            <td>
+                                <div class="input-group">
+                                {{if required}}
+                                
+
+                                    {{if type == 'file'}}
+                                    <input class="form-control" type="file" p_operationId="{{:~root.operationId}}" name="{{:name}}" in="{{:in}}"
+                                        required="required" value="{{:default}}" placeholder="required">
+                                    {{else}}
+                                    <input class="form-control" type="text" p_operationId="{{:~root.operationId}}" name="{{:name}}" {{if enum}} data-name="1111" {{/if}} in="{{:in}}"
+                                        required="required" value="{{:default}}" placeholder="required"
+                                        autocomplete="off"
+                                        class="layui-input">
+                                    {{/if}}
+                                    {{else}}
+                                    {{if type == 'file'}}
+                                    <input class="form-control" type="file" p_operationId="{{:~root.operationId}}" name="{{:name}}" in="{{:in}}"
+                                        value="{{:default}}">
+                                    {{else}}
+                                    <input class="form-control" type="text" p_operationId="{{:~root.operationId}}" name="{{:name}}" in="{{:in}}"
+                                        autocomplete="off" value="{{:default}}" class="layui-input">
+                                    {{/if}}
+
+                                  
+                                                        
+                                {{/if}}
+                                {{if enum}} 
+                                <div class="input-group-append">
+                                        <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                                        <div class="dropdown-menu">
+                                        {{for enum}}
+                                          <a class="dropdown-item" href="#">{^{:#data}}</a>
+                                        {{/for}}
+                                        </div>
+                                      </div>
+                                
+                                {{/if}}  
+                                </div> 
+
+                            </td>
+                            <td>{{:description}}</td>
+                            <td>{{:in}}</td>
+                            <td>{{:type}}</td>
+                            {{if required}}
+                            <td><i class="layui-icon">&#xe618;</i></td>
+                            {{else}}
+                            <td></td>
+                            {{/if}}
+                        </tr>
+                        {{/for}}
+                        </tbody>
+                    </table>
+                </form>
+                <div>
+                    <button class="layui-btn" name="btn_submit" onclick="getData('{{:operationId}}')"> Submit</button>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        <div class="progress" style="height: 1px;">
+                            <div class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+
+                        <nav class="navbar navbar-light bg-light">
+        
+                                <ul class="pagination nav">
+                                        <li class="page-item disabled">
+                                          <a class="page-link" href="#" tabindex="-1" aria-disabled="true">response</a>
+                                        </li>
+                                        <li class="page-item active">
+                                            <a class="page-link" data-toggle="tab" href="#code">Code</a>
+                                        </li>
+                                        <li class="page-item">
+                                            <a class="page-link" data-toggle="tab" href="#jsonView">json-view</a>
+                                        </li>
+                                        <li class="page-item">
+                                            <a class="page-link" data-toggle="tab" href="#tableView">table-view</a>
+                                        </li>
+                                </ul>
+                                <ul class="nav justify-content-end">
+                                        <li class="nav-item">
+                                            <button type="button" style="pointer-events: none;" class="btn btn-outline-primary" id="statusCode">Primary</button>
+                                        </li>
+                                        
+                                        <li class="nav-item">
+                                            <button class="btn btn-primary" type="button" onclick="copyToClipboard();$(this).text('Copied!');" onmouseleave="$(this).text('Copy');">Copy</button>
+                                        </li>
+                                </ul>
+                        </nav>
+                        <div class="responseJson" id="responseJson">
+                            <div class="tab-content">
+                                    <div id="code" class="tab-pane active">
+                                        <pre id="json-response"></pre>
+                                    </div>
+                                    <div id="jsonView" class="tab-pane fade"><br>
+                                        <pre id="json-viewer"></pre>
+                                    </div>
+                                    <div id="tableView" class="tab-pane fade"><br>
+                                        <div id="root"></div>
+                                    </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</script>
+
+
+<script id="temp_body_ref_model" type="text/template">
+    <table class="layui-table">
+        <colgroup>
+            <col width="150">
+            <col width="300">
+            <col>
+        </colgroup>
+        <thead>
+        <tr class="ref_entity">
+            <td colspan="3" id="ref-{{:domId}}-{{:name}}">{{:name}} :</td>
+        </tr>
+        <tr>
+            <th>Properties</th>
+            <th>Type</th>
+            <th>Description</th>
+        </tr>
+        </thead>
+        <tbody>
+        {{props properties}}
+        <tr>
+            <td>{{:key}}</td>
+            <td>{{:prop.type}}</td>
+            <td>{{:prop.description}}</td>
+        </tr>
+        {{/props}}
+        </tbody>
+    </table>
+</script>
+
+<script id="temp_body_type" type="text/template">
+    <blockquote class="layui-elem-quote layui-quote-nm">{{:type}}</blockquote>
+</script>
+
+</body>
+<script src="./swagger-ui-layer/src/main/resources/webjars/layui/layui.js"></script>
+<script src="./swagger-ui-layer/src/main/resources/webjars/js/jquery.js"></script>
+<script src="./swagger-ui-layer/src/main/resources/webjars/js/popper.min.js"></script>
+<script src="./swagger-ui-layer/src/main/resources/webjars/js/bootstrap.4.1.3.min.js"></script>
+<script src="./swagger-ui-layer/src/main/resources/webjars/js/json2table.js"></script>
+<script src="./swagger-ui-layer/src/main/resources/webjars/js/jsrender.min.js"></script>
+<script src="./swagger-ui-layer/src/main/resources/webjars/js/jquery.json-viewer.js"></script>
+<script src="./swagger-ui-layer/src/main/resources/webjars/js/ace.js"></script>
+<script src="./swagger-ui-layer/src/main/resources/webjars/js/mode-json.js"></script>
+<script src="./swagger-ui-layer/src/main/resources/webjars/js/mode-text.js"></script>
+<script src="./swagger-ui-layer/src/main/resources/webjars/js/theme-monokai.js"></script>
+
+<script src="./swagger-ui-layer/src/main/resources/webjars/js/html2pdf.bundle.js"></script>
+<script src="./swagger-ui-layer/src/main/resources/webjars/js/docs.js"></script>
+
+<script>
+function resize() {
+    var sidebarHeader = $(".sidebar-header").height()
+    var sidebarBody = $("#sidebar-body").height()
+    $("#sidebar-body").css('height',(sidebarBody-sidebarHeader)+'px')
+    return (sidebarHeader)
+}
+setTimeout(() => {
+    resize()
+}, 400);
+window.onresize = function(event) {
+    resize()
+};
+$(document).ready(function () {
+    $('.page-link').on('click', function () {
+        $('.page-item').closest('.page-item').removeClass('active')
+        $(this).closest('.page-item').addClass('active')
+    });
+    $('#sidebar-toggle').on('click', function () {
+        // open or close navbar
+        $('#sidebar').toggleClass('active');
+        $('#sidebar-toggle').toggleClass('active');
+        $('#path-body').toggleClass('active');
+    });
+    $( window ).resize(function() {
+        sizeWindows()
+    });
+});
+</script>
+</html>

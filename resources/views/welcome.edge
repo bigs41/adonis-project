@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>SVOA</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script>
+  {{ style('style') }}
+  @set('encrypt',help.encrypt('12345'))
+  @set('decrypt',help.decrypt(encrypt))
+  @set('numthai',help.numthai('1234','to-th'))
+  @set('data',[
+    { "name": "abc1", "age": 50 },
+    { "name": "abc2", "age": 50 },
+    { "name": "abc3", "age": 50 },
+  ])
+</head>
+<body>
+  <section>
+    <div class="subtitle">
+        <div>{{numthai}}</div>
+    <h1>SVOA</h1>
+        <div class="card" style="width: 18rem;">
+            <ul class="list-group list-group-flush">
+              <li class="list-group-item"><a class="btn btn-primary btn-lg btn-block" href="/docs">doc</a></li>
+              <li class="list-group-item"><a class="btn btn-primary btn-lg btn-block" href="/doc2">doc2</a></li>
+              <li class="list-group-item"><a class="btn btn-primary btn-lg btn-block" href="/api_json">json</a></li>
+              <li class="list-group-item"><a class="btn btn-primary btn-lg btn-block" href="" id="import">import postman</a></li>
+            </ul>
+          </div>
+    </div>
+    <hr>
+    
+  </section>
+  <script>
+    function base_url(segment){
+      // get the segments
+      pathArray = window.location.pathname.split( '/' );
+      // find where the segment is located
+      indexOfSegment = pathArray.indexOf(segment);
+      // make base_url be the origin plus the path to the segment
+      return window.location.origin + pathArray.slice(0,indexOfSegment).join('/') + '/';
+    }
+    $('#import').attr('href','postman://app/collections/import/70ef6f3b4f0bbfbac153?referrer='+base_url()+'api_json')
+  </script>
+</body>
+</html>
