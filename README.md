@@ -46,6 +46,12 @@ or manually clone the repo and then run `npm install`.
     ```
 
 ## Helpers more function
+
+use Helpers
+
+    const Helpers = use('Help');
+     
+
 1. encrypt encryption format laravel
     ```js
     Helpers.encrypt('1234') 
