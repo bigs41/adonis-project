@@ -2,7 +2,7 @@
 
 const { ServiceProvider } = require('@adonisjs/fold')
 const Helpers = use('App/Helpers');
-
+const Helper = use('Helpers');
 class HelperProvider extends ServiceProvider {
   /**
    * Register namespaces to the IoC container
@@ -12,7 +12,7 @@ class HelperProvider extends ServiceProvider {
    * @return {void}
    */
   register () {
-    this.app.singleton('Adonis/Helpers', () => new Helpers)
+    this.app.singleton('Adonis/Helpers', () => new Helpers(Helper.appRoot()))
     this.app.alias('Adonis/Helpers', 'Help')
   }
 
